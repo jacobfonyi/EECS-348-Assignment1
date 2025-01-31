@@ -2,9 +2,28 @@ class MaxHeap:
     def __init__(self):
         self.heap = []
 
-    def _priority(self, patient):
-        # Create a tuple to compare priorities using these factors: (severity, age, arrival_order)
-        return (-patient.severity, -patient.age, patient.arrival_order)
+    def push(self, email):
+        self.heap.append(email)
+        self._heapify_up(len(self.heap) - 1)
+
+    def pop(self):
+        if len(self.heap) > 1:
+            self._swap(0, len(self.heap) - 1)
+            email = self.heap.pop()
+            self._heapify_down(0)
+            return email
+        elif self.heap:
+            return self.heap.pop()
+        return None
+
+    def peek(self):
+        if self.heap:
+            return self.heap[0]
+        return None
+
+    def count(self):
+        return len(self.heap)
+
 
     def _heapify_up(self, index):
         parent = (index - 1) // 2
@@ -15,32 +34,21 @@ class MaxHeap:
 
     def _heapify_down(self, index):
         size = len(self.heap)
-        largest = index
-        left = 2 * index + 1
-        right = 2 * index + 2
+        while True:
+            left = 2 * index + 1
+            right = 2 * index + 2
+            largest = index
+            if left < size and self.heap[left] < self.heap[largest]:
+                largest = left
+            if right < size and self.heap[right] < self.heap[largest]:
+                largest = right
+            if largest == index:
+                break
+            self._swap(index, largest)
+            index = largest
 
-        if left < size and self._priority(self.heap[left]) < self._priority(self.heap[largest]):
-            largest = left
-        if right < size and self._priority(self.heap[right]) < self._priority(self.heap[largest]):
-            largest = right
-
-        if largest != index:
-            self.heap[index], self.heap[largest] = self.heap[largest], self.heap[index]
-            self._heapify_down(largest)
-
-    def insert(self, patient):
-        self.heap.append(patient)
-        self._heapify_up(len(self.heap) - 1)
-
-    def extract_max(self):
-        if not self.heap:
-            return None
-        if len(self.heap) == 1:
-            return self.heap.pop()
-        root = self.heap[0]
-        self.heap[0] = self.heap.pop()
-        self._heapify_down(0)
-        return root
+    def _swap(self, i, j):
+        self.heap[i], self.heap[j] = self.heap[j], self.heap[i]
 
     def peek_max(self):
         return self.heap[0] if self.heap else None
